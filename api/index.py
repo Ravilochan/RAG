@@ -17,15 +17,15 @@ chain = ""
 
 # prompt template
 template = ""
-# prompt intiallization
+# prompt initialization
 prompt = " "
 
 # loading pdf and splitting them
 loader = ""
 pages = ""
 
-#vector store to store embeddings for easy retreival
-vectorstore = ""
+#vector store to store embeddings for easy retrieval
+vector_store = ""
 
 #Retriever which retrieves the values
 retriever = ""
@@ -56,7 +56,7 @@ def key_validation(key:Key):
 
     Question: {question}
     """
-    # prompt intiallization
+    # prompt initialization
     prompt = PromptTemplate.from_template(template)
     try:
         chain.invoke("tell me a joke")
@@ -68,7 +68,7 @@ def key_validation(key:Key):
 
 @app.post("/api/python")
 async def upload_pdf(file: UploadFile = File(...)):
-    global loader,pages,vectorstore,retriever,chain
+    global loader,pages,vector_store,retriever,chain
     contents = await file.read()
 
     with open(file.filename, "wb") as f:
@@ -76,8 +76,8 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     loader = PyPDFLoader(file.filename)
     pages = loader.load_and_split()
-    vectorstore = DocArrayInMemorySearch.from_documents(pages, embedding=gemini_embeddings)
-    retriever = vectorstore.as_retriever()
+    vector_store = DocArrayInMemorySearch.from_documents(pages, embedding=gemini_embeddings)
+    retriever = vector_store.as_retriever()
     chain = (
     {
         "context": itemgetter("question") | retriever,
